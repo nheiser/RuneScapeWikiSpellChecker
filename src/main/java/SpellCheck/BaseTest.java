@@ -25,7 +25,7 @@ public class BaseTest {
 
 	@BeforeTest
 	public void initialize() {
-		System.setProperty("webdriver.chrome.driver","C:\\Program Files (x86)\\chromedriver.exe");
+		System.setProperty("webdriver.chrome.driver","C:\\Users\\nheis\\eclipse-workspace\\RuneScapeWikiSpellChecker\\src\\main\\resources\\drivers\\chromedriver.exe");
 		driver = new ChromeDriver();
 		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
 		action = new Actions(driver);
@@ -35,14 +35,20 @@ public class BaseTest {
 	public void teardown() {
 		driver.quit();
 	}
+	
+	public void getAllLinks(String url) {
+		
+		
+	}
+	
+	
 
-	public void addWordsToDict(String url) throws IOException {
+	public void addWordsToDictionary(String url) throws IOException {
 
 		driver.navigate().to(url);
 
 		FileWriter filewriter = new FileWriter(fileName, true);
-
-		Set<String> allWords = getWordsFromDict();
+		Set<String> allWords = getWordsFromDict(fileName);
 		
 		List<WebElement> links = driver.findElements(By.tagName("a"));
 		int count = 0;
@@ -72,7 +78,7 @@ public class BaseTest {
 		filewriter.close();
 	}
 
-	public Set<String> getWordsFromDict() throws FileNotFoundException{
+	public static Set<String> getWordsFromDict(String fileName) throws FileNotFoundException{
 		File file = new File(fileName);
 		Scanner scanner = new Scanner(file);
 
@@ -82,11 +88,12 @@ public class BaseTest {
 			allWords.add(scanner.nextLine());
 		}
 		scanner.close();
+		
 		return allWords;
 
 	}
 
-	public String cleanString(String s) {
+	public static String cleanString(String s) {
 		//remove ,'s and .'s
 		if (s.charAt(0) == '(' || s.charAt(0) == '\"' || s.charAt(0) == '[') {
 			s = s.substring(1);

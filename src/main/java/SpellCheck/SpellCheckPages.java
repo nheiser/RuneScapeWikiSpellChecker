@@ -27,14 +27,15 @@ public class SpellCheckPages extends BaseTest{
 
 		driver.navigate().to("https://oldschool.runescape.wiki/w/Another_Slice_of_H.A.M.");
 		//driver.findElement(By.linkText("Random page")).click();
-
-		addWordsToDict(driver.getCurrentUrl());
+		
+		String url = driver.getCurrentUrl();
+		addWordsToDictionary(url);
 
 		String rawText = driver.findElement(By.tagName("body")).getText();
 		String text = "";
 		String line = "";
 
-		Set<String> allWords = getWordsFromDict();
+		Set<String> allWords = getWordsFromDict("C:\\Users\\nheis\\eclipse-workspace\\RuneScapeWikiSpellChecker\\src\\main\\resources\\OSRS-Dictionary.txt");
 		List<String> allWords2 = new ArrayList<String>();
 		allWords2.addAll(allWords);
 
@@ -52,34 +53,35 @@ public class SpellCheckPages extends BaseTest{
 
 	}
 
-	public String getSentence(String text, RuleMatch match) {
+	public static String getSentence(String text, int startPos, int endPos) {
 
-		int start = match.getFromPos();
-		int end = match.getToPos();
+		//int start = match.getFromPos();
+		//int end = match.getToPos();
 
-		while(end < text.length()) {
-			if (text.charAt(end) == '.') {
+		while(endPos < text.length() - 1) {
+			if (text.charAt(endPos) == '.') {
 				break;
 			}
-			end++;
+			endPos++;
 
 		}
-		while (start >= 0) {
+		while (startPos > 0) {
 
-			if (text.charAt(start) == '.') {
-				start++;
+			if (text.charAt(startPos) == '.') {
+				startPos++;
 				break;
 			}
-			if (text.charAt(start) == '\n') {
+			if (text.charAt(startPos) == '\n') {
 				break;
 			}
-			start--;
+			startPos--;
 		}
-
-		return text.substring(start, end + 1).trim();
+		
+		return text.substring(startPos, endPos + 1).trim();
+		//return text.substring(startPos, endPos).trim();
 
 	}
-	public void checkSpelling(String text, List<String> exceptions) throws IOException {
+	public static String checkSpelling(String text, List<String> exceptions) throws IOException {
 
 		List<String> ignore = new ArrayList<String>();
 		//ignore.add("OXFORD_SPELLING_Z_NOT_S");
@@ -120,17 +122,20 @@ public class SpellCheckPages extends BaseTest{
 		}
 
 		List<RuleMatch> matches = langTool.check(text);
+		String sentence = "";
 
 		for (RuleMatch match : matches) {
-
+			sentence = getSentence(text, match.getFromPos(), match.getToPos());
+			
 			System.out.println("Potential error " +
 					"<" + text.substring(match.getFromPos(), match.getToPos()) + ">" +  
-					"\n" + getSentence(text, match) +
+					"\n" + sentence +
 					"\nID: " + match.getRule().getId() + " = " + match.getMessage());
 			System.out.println("Suggested correction(s): " +
 					match.getSuggestedReplacements() + "\n");
 		}
 
+		return sentence;
 	}
 
 }
