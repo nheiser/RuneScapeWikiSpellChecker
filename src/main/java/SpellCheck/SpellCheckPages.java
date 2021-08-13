@@ -16,6 +16,7 @@ import org.languagetool.language.BritishEnglish;
 import org.languagetool.rules.Rule;
 import org.languagetool.rules.RuleMatch;
 import org.languagetool.rules.spelling.SpellingCheckRule;
+import org.languagetool.tools.ContextTools;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.testng.annotations.Test;
@@ -27,7 +28,7 @@ public class SpellCheckPages extends BaseTest{
 
 		driver.navigate().to("https://oldschool.runescape.wiki/w/Another_Slice_of_H.A.M.");
 		//driver.findElement(By.linkText("Random page")).click();
-		
+
 		String url = driver.getCurrentUrl();
 		addWordsToDictionary(url);
 
@@ -54,7 +55,7 @@ public class SpellCheckPages extends BaseTest{
 	}
 
 	public static String getSentence(String text, int startPos, int endPos) {
-
+		
 		//int start = match.getFromPos();
 		//int end = match.getToPos();
 
@@ -76,10 +77,10 @@ public class SpellCheckPages extends BaseTest{
 			}
 			startPos--;
 		}
-		
+
 		return text.substring(startPos, endPos + 1).trim();
 		//return text.substring(startPos, endPos).trim();
-
+		
 	}
 	public static String checkSpelling(String text, List<String> exceptions) throws IOException {
 
@@ -123,10 +124,11 @@ public class SpellCheckPages extends BaseTest{
 
 		List<RuleMatch> matches = langTool.check(text);
 		String sentence = "";
+		ContextTools c = new ContextTools();
 
 		for (RuleMatch match : matches) {
-			sentence = getSentence(text, match.getFromPos(), match.getToPos());
-			
+			sentence = c.getPlainTextContext(match.getFromPos(), match.getToPos(), text);//getSentence(text, match.getFromPos(), match.getToPos());
+
 			System.out.println("Potential error " +
 					"<" + text.substring(match.getFromPos(), match.getToPos()) + ">" +  
 					"\n" + sentence +
