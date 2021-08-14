@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Scanner;
@@ -48,7 +49,10 @@ public class BaseTest {
 		driver.navigate().to(url);
 
 		FileWriter filewriter = new FileWriter(fileName, true);
-		Set<String> allWords = getWordsFromDict(fileName);
+		List<String> allWords = getWordsFromDictionary(fileName);
+		Set<String> words = new HashSet<String>();
+		words.addAll(allWords);
+		
 		
 		List<WebElement> links = driver.findElements(By.tagName("a"));
 		int count = 0;
@@ -64,7 +68,7 @@ public class BaseTest {
 					s = cleanString(s);
 				}
 				
-				if (s.length() > 1 && s.matches(".*[a-zA-Z]+.*") && allWords.add(s)) {
+				if (s.length() > 1 && s.matches(".*[a-zA-Z]+.*") && words.add(s)) {
 					count++;
 					filewriter.append(s);
 					filewriter.append('\n');
@@ -78,8 +82,8 @@ public class BaseTest {
 		filewriter.close();
 	}
 
-	public static Set<String> getWordsFromDict(String fileName) throws FileNotFoundException{
-		File file = new File(fileName);
+	public static List<String> getWordsFromDictionary(String path) throws FileNotFoundException{
+		File file = new File(path);
 		Scanner scanner = new Scanner(file);
 
 		Set<String> allWords = new HashSet<String>();
@@ -88,8 +92,12 @@ public class BaseTest {
 			allWords.add(scanner.nextLine());
 		}
 		scanner.close();
+
+		List<String> list = new ArrayList<String>();
+		list.addAll(allWords);
 		
-		return allWords;
+		
+		return list;
 
 	}
 

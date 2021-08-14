@@ -2,16 +2,20 @@ package SpellCheck;
 
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Scanner;
 import java.util.Set;
 
+import org.languagetool.AnalyzedSentence;
 import org.languagetool.JLanguageTool;
+import org.languagetool.language.AmericanEnglish;
 import org.languagetool.language.BritishEnglish;
 import org.languagetool.rules.Rule;
 import org.languagetool.rules.RuleMatch;
@@ -36,9 +40,9 @@ public class SpellCheckPages extends BaseTest{
 		String text = "";
 		String line = "";
 
-		Set<String> allWords = getWordsFromDict("C:\\Users\\nheis\\eclipse-workspace\\RuneScapeWikiSpellChecker\\src\\main\\resources\\OSRS-Dictionary.txt");
-		List<String> allWords2 = new ArrayList<String>();
-		allWords2.addAll(allWords);
+		List<String> allWords = getWordsFromDictionary("C:\\Users\\nheis\\eclipse-workspace\\RuneScapeWikiSpellChecker\\src\\main\\resources\\OSRS-Dictionary.txt");
+		//List<String> allWords2 = new ArrayList<String>();
+		//allWords2.addAll(allWords);
 
 		while (rawText.indexOf('\n') != -1) {
 
@@ -50,12 +54,12 @@ public class SpellCheckPages extends BaseTest{
 			rawText = rawText.substring(rawText.indexOf('\n') + 1);
 		}
 
-		checkSpelling(text, allWords2);
+		checkSpelling(text, allWords);
 
 	}
 
 	public static String getSentence(String text, int startPos, int endPos) {
-		
+
 		//int start = match.getFromPos();
 		//int end = match.getToPos();
 
@@ -80,9 +84,9 @@ public class SpellCheckPages extends BaseTest{
 
 		return text.substring(startPos, endPos + 1).trim();
 		//return text.substring(startPos, endPos).trim();
-		
+
 	}
-	public static String checkSpelling(String text, List<String> exceptions) throws IOException {
+	public static boolean checkSpelling(String text, List<String> exceptions) throws IOException {
 
 		List<String> ignore = new ArrayList<String>();
 		//ignore.add("OXFORD_SPELLING_Z_NOT_S");
@@ -110,34 +114,54 @@ public class SpellCheckPages extends BaseTest{
 		//
 		//
 		//
+		//
 
+		//1. disable spell check
+		//2. check vs allowed words
+		//3. check vs prohibitied words
+		//4. enable spell check
+
+
+		List<String> wordsToIgnore = exceptions;
 		JLanguageTool langTool = new JLanguageTool(new BritishEnglish());
 		langTool.disableRules(ignore);
 
 		for (Rule rule : langTool.getAllActiveRules()) {
 
 			if (rule instanceof SpellingCheckRule) {
-				List<String> wordsToIgnore = exceptions;
+
+				//((SpellingCheckRule)rule).acceptPhrases(wordsToIgnore);
+
 				((SpellingCheckRule)rule).addIgnoreTokens(wordsToIgnore);
 			}
 		}
 
 		List<RuleMatch> matches = langTool.check(text);
-		String sentence = "";
+		String sentence;
+		String word;
 		ContextTools c = new ContextTools();
+		boolean b = true;
 
-		for (RuleMatch match : matches) {
-			sentence = c.getPlainTextContext(match.getFromPos(), match.getToPos(), text);//getSentence(text, match.getFromPos(), match.getToPos());
+		for (RuleMatch match: matches) {
 
-			System.out.println("Potential error " +
-					"<" + text.substring(match.getFromPos(), match.getToPos()) + ">" +  
-					"\n" + sentence +
-					"\nID: " + match.getRule().getId() + " = " + match.getMessage());
-			System.out.println("Suggested correction(s): " +
-					match.getSuggestedReplacements() + "\n");
+			word = text.substring(match.getFromPos(), match.getToPos());
+			sentence = c.getPlainTextContext(match.getFromPos(), match.getToPos(), text);
+
+			if (!getWordsFromDictionary("C:\\Users\\nheis\\eclipse-workspace\\RuneScapeWikiSpellChecker\\src\\main\\resources\\OSRS-Dictionary.txt").contains(word)) {
+
+				b = false;
+				System.out.println("Potential error " +
+						"<" + word + ">" +  
+						"\n" + match.getSentence().getText() +
+						"\nID: " + match.getRule().getId() + " = " + match.getMessage());
+				System.out.println("Suggested correction(s): " +
+						match.getSuggestedReplacements() + "\n");
+
+			}
+
 		}
 
-		return sentence;
+		return b;
 	}
 
 }

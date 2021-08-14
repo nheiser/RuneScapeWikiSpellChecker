@@ -5,7 +5,7 @@
     <classes>
       <class name="testMethods.test">
         <methods>
-          <include name="testGetSentence" invocation-numbers="0 1 2"/>
+          <include name="testCheckSpelling" invocation-numbers="13 35"/>
         </methods>
       </class> <!-- testMethods.test -->
     </classes>
