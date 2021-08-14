@@ -41,8 +41,6 @@ public class SpellCheckPages extends BaseTest{
 		String line = "";
 
 		List<String> allWords = getWordsFromDictionary("C:\\Users\\nheis\\eclipse-workspace\\RuneScapeWikiSpellChecker\\src\\main\\resources\\OSRS-Dictionary.txt");
-		//List<String> allWords2 = new ArrayList<String>();
-		//allWords2.addAll(allWords);
 
 		while (rawText.indexOf('\n') != -1) {
 
@@ -116,12 +114,6 @@ public class SpellCheckPages extends BaseTest{
 		//
 		//
 
-		//1. disable spell check
-		//2. check vs allowed words
-		//3. check vs prohibitied words
-		//4. enable spell check
-
-
 		List<String> wordsToIgnore = exceptions;
 		JLanguageTool langTool = new JLanguageTool(new BritishEnglish());
 		langTool.disableRules(ignore);
@@ -152,7 +144,7 @@ public class SpellCheckPages extends BaseTest{
 				b = false;
 				System.out.println("Potential error " +
 						"<" + word + ">" +  
-						"\n" + match.getSentence().getText() +
+						"\n" + sentence +
 						"\nID: " + match.getRule().getId() + " = " + match.getMessage());
 				System.out.println("Suggested correction(s): " +
 						match.getSuggestedReplacements() + "\n");

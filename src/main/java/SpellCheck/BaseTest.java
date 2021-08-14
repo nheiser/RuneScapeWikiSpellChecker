@@ -36,45 +36,46 @@ public class BaseTest {
 	public void teardown() {
 		driver.quit();
 	}
-	
-	public void getAllLinks(String url) {
-		
-		
+
+	public List<String> getAllLinkWords(String url) {
+		List<WebElement> links = driver.findElements(By.tagName("a"));
+		List<String> words = new ArrayList<String>();
+
+		//link: [King Black Dragon]
+		//words: [King, Black, Dragon]
+
+		for(WebElement link: links) {
+			for(String s: link.getText().split(" ")) {
+				words.add(s.toLowerCase());
+			}
+		}
+		return words;
 	}
-	
-	
 
 	public void addWordsToDictionary(String url) throws IOException {
 
-		driver.navigate().to(url);
+		//driver.navigate().to(url);
 
 		FileWriter filewriter = new FileWriter(fileName, true);
-		List<String> allWords = getWordsFromDictionary(fileName);
+		List<String> dictionaryWords = getWordsFromDictionary(fileName);
 		Set<String> words = new HashSet<String>();
-		words.addAll(allWords);
-		
-		
-		List<WebElement> links = driver.findElements(By.tagName("a"));
+		words.addAll(dictionaryWords);
+
+		List<String> linkWords = getAllLinkWords(url);
+
+		//List<WebElement> links = driver.findElements(By.tagName("a"));
 		int count = 0;
-		String[] temp;
 
-		for (WebElement link: links) {
+		for (String word: linkWords) {
 
-			temp = link.getText().toLowerCase().split(" ");
-
-			for (String s: temp) {
-				
-				if (s.length() > 1) {
-					s = cleanString(s);
-				}
-				
-				if (s.length() > 1 && s.matches(".*[a-zA-Z]+.*") && words.add(s)) {
-					count++;
-					filewriter.append(s);
-					filewriter.append('\n');
-				}
+			if (word.length() > 1) {
+				word = cleanString(word);
+			}				
+			if (word.length() > 1 && word.matches(".*[a-zA-Z]+.*") && words.add(word)) {
+				count++;
+				filewriter.append(word);
+				filewriter.append('\n');
 			}
-
 
 		}
 		System.out.println("Added " + count + " new words from: " + url);
@@ -94,9 +95,8 @@ public class BaseTest {
 		scanner.close();
 
 		List<String> list = new ArrayList<String>();
-		list.addAll(allWords);
-		
-		
+		list.addAll(allWords);		
+
 		return list;
 
 	}
@@ -121,7 +121,7 @@ public class BaseTest {
 		if (s.contains("\"")) {
 			return s.substring(0, s.length() - 1);
 		}
-	
+
 		return s;
 	}
 

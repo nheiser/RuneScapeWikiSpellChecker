@@ -1,2 +1,4 @@
 capitalize
 tradable
+recognize
+summarizes

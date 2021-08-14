@@ -2,6 +2,10 @@ floor
 numbering
 quick
 capitalise
+recognise
+minimap
+summarises
+longrange
 guide
 found
 here
