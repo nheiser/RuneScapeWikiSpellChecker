@@ -5,7 +5,7 @@
     <classes>
       <class name="SpellCheck.SpellCheckPages">
         <methods>
-          <include name="spellCheck"/>
+          <include name="spellCheck" invocation-numbers="1 2 4 5 7 8 9 10 11 12 14 15 16 17 18 20 21 22 24 25 27 29 30 32 33 34 36 37 38 39 40 41 42 43 44 45 46 47 50 51 52 55 56 57 58 59 60 62 63 64 65 66 67 70 73 74 75 76 77 78 80 81 84 85 86 87 88 89 92 93 94 97 98 99"/>
           <include name="initialize"/>
           <include name="teardown"/>
         </methods>

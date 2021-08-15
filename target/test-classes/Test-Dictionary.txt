@@ -1,9 +1,10 @@
-Capitalise
-Bloodveld
-Mort'ton
-Free-to-play
-Zulrah
-Heroes
-Anti-dragon shield
-Anti-dragon
-spellbook
+capitalise
+bloodveld
+mort'ton
+free-to-play
+heroes
+spell/book
+h.a.m.
+free.to.play.
+potion
+zulrah

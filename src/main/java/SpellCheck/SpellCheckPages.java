@@ -23,36 +23,53 @@ import org.languagetool.rules.spelling.SpellingCheckRule;
 import org.languagetool.tools.ContextTools;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
+import org.testng.Reporter;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 public class SpellCheckPages extends BaseTest{
 
-	@Test
-	public void spellCheck() throws IOException {
+	@DataProvider
+	public Object[][] getRandomPages(){
 
-		driver.navigate().to("https://oldschool.runescape.wiki/w/Another_Slice_of_H.A.M.");
-		//driver.findElement(By.linkText("Random page")).click();
+		int length = 100;
+		
+		Object[][] o = new Object[length][1];
+		driver.navigate().to("https://oldschool.runescape.wiki/");
+		List<String> pages = new ArrayList<String>();
+
+		for (int i = 0; i < length; i++) {
+
+			driver.findElement(By.linkText("Random page")).click();
+			pages.add(driver.getCurrentUrl());
+			o[i][0] = driver.getCurrentUrl();
+		}
+		return o;
+
+	}
+
+	@Test (dataProvider = "getRandomPages")
+	public void spellCheck(String page) throws IOException {
+
+		String fileName = "C:\\Users\\nheis\\eclipse-workspace\\RuneScapeWikiSpellChecker\\src\\main\\resources\\OSRS-Dictionary.txt";
+
+		driver.navigate().to(page);
 
 		String url = driver.getCurrentUrl();
-		addWordsToDictionary(url);
+
+		List<String> allLinkWords = getAllLinkWords(url);
+
+		//addWordsToDictionary(allLinkWords);
 
 		String rawText = driver.findElement(By.tagName("body")).getText();
-		String text = "";
-		String line = "";
+
+		String cleanText = getCleanText(rawText);
 
 		List<String> allWords = getWordsFromDictionary("C:\\Users\\nheis\\eclipse-workspace\\RuneScapeWikiSpellChecker\\src\\main\\resources\\OSRS-Dictionary.txt");
 
-		while (rawText.indexOf('\n') != -1) {
-
-			line = rawText.substring(0, rawText.indexOf('\n'));
-			if (line.contains(".")) {
-				text = text + rawText.substring(0, rawText.indexOf('\n')) + "\n";
-			}
-
-			rawText = rawText.substring(rawText.indexOf('\n') + 1);
-		}
-
-		checkSpelling(text, allWords);
+		//System.out.print(url + ": ");
+		
+		assert(checkSpelling(cleanText, fileName, allWords, allLinkWords));
 
 	}
 
@@ -84,7 +101,7 @@ public class SpellCheckPages extends BaseTest{
 		//return text.substring(startPos, endPos).trim();
 
 	}
-	public static boolean checkSpelling(String text, List<String> exceptions) throws IOException {
+	public static boolean checkSpelling(String text, String fileName, List<String> exceptions, List<String> linkExceptions) throws IOException {
 
 		List<String> ignore = new ArrayList<String>();
 		//ignore.add("OXFORD_SPELLING_Z_NOT_S");
@@ -109,8 +126,8 @@ public class SpellCheckPages extends BaseTest{
 		ignore.add("LITTLE_BIT");
 		ignore.add("ALL_OF_THE");
 		ignore.add("CLICK_HYPHEN");
-		//
-		//
+		//MISSING_HYPHEN 
+		//CLOSE_SCRUTINY 
 		//
 		//
 
@@ -129,30 +146,52 @@ public class SpellCheckPages extends BaseTest{
 		}
 
 		List<RuleMatch> matches = langTool.check(text);
-		String sentence;
+		AnalyzedSentence sentence;
 		String word;
 		ContextTools c = new ContextTools();
 		boolean b = true;
+		int count = 0;
 
 		for (RuleMatch match: matches) {
 
 			word = text.substring(match.getFromPos(), match.getToPos());
-			sentence = c.getPlainTextContext(match.getFromPos(), match.getToPos(), text);
+			//sentence = c.getPlainTextContext(match.getFromPos(), match.getToPos(), text);
+			sentence = match.getSentence();
 
 			if (!getWordsFromDictionary("C:\\Users\\nheis\\eclipse-workspace\\RuneScapeWikiSpellChecker\\src\\main\\resources\\OSRS-Dictionary.txt").contains(word)) {
 
-				b = false;
-				System.out.println("Potential error " +
-						"<" + word + ">" +  
-						"\n" + sentence +
-						"\nID: " + match.getRule().getId() + " = " + match.getMessage());
-				System.out.println("Suggested correction(s): " +
-						match.getSuggestedReplacements() + "\n");
+				if (linkExceptions.contains(word)) {
+					count++;
+					addWordToDictionary(word, fileName);
+				}
+				else {
+					b = false;
+
+					System.out.println("\nPotential error " + word +   
+							"\n" + sentence.getText() +
+							"\nID: " + match.getRule().getId() + " = " + match.getMessage() + 
+							"\nSuggested correction(s): " +
+							match.getSuggestedReplacements() + "\n"
+
+							);
+
+					String errorMessage = 
+							"<br>Potential error: " + word +  
+							"<br>" + sentence.getText() +
+							"<br>ID: " + match.getRule().getId() + " = " + match.getMessage() + 
+							"<br>Suggested correction(s): " +
+							match.getSuggestedReplacements() + "<br>";
+
+					Reporter.log(errorMessage);
+
+				}
 
 			}
 
 		}
 
+		System.out.println("Added " + count + " new words.");
+		
 		return b;
 	}
 

@@ -52,7 +52,18 @@ public class BaseTest {
 		return words;
 	}
 
-	public void addWordsToDictionary(String url) throws IOException {
+	public static void addWordToDictionary(String word, String fileName) throws IOException {
+		FileWriter filewriter = new FileWriter(fileName, true);
+		//List<String> dictionaryWords = getWordsFromDictionary(fileName);
+		//Set<String> words = new HashSet<String>();
+		//words.addAll(dictionaryWords);
+
+		filewriter.append(word);
+		filewriter.append("\n");
+		filewriter.flush();
+		filewriter.close();
+	}
+	public void addWordsToDictionary(List<String> newWords) throws IOException {
 
 		//driver.navigate().to(url);
 
@@ -61,12 +72,9 @@ public class BaseTest {
 		Set<String> words = new HashSet<String>();
 		words.addAll(dictionaryWords);
 
-		List<String> linkWords = getAllLinkWords(url);
-
-		//List<WebElement> links = driver.findElements(By.tagName("a"));
 		int count = 0;
 
-		for (String word: linkWords) {
+		for (String word: newWords) {
 
 			if (word.length() > 1) {
 				word = cleanString(word);
@@ -75,10 +83,11 @@ public class BaseTest {
 				count++;
 				filewriter.append(word);
 				filewriter.append('\n');
+				//System.out.print(word);
 			}
 
 		}
-		System.out.println("Added " + count + " new words from: " + url);
+		System.out.println("Added " + count + " new words from: " + driver.getCurrentUrl());
 		filewriter.flush();
 		filewriter.close();
 	}
@@ -101,9 +110,41 @@ public class BaseTest {
 
 	}
 
+	public static String getCleanText(String rawText) {
+
+		String text = "";
+		String line = "";
+
+		while (rawText.indexOf('\n') != -1) {
+
+			line = rawText.substring(0, rawText.indexOf('\n'));
+			
+			//only check text if it has a period and at least 4 words
+			if (line.contains(".") && line.split(" ").length >= 4) {
+				text = text + rawText.substring(0, rawText.indexOf('\n')) + "\n";
+			}
+
+			rawText = rawText.substring(rawText.indexOf('\n') + 1);
+		}
+
+		return text;
+	}
+
+
 	public static String cleanString(String s) {
-		//remove ,'s and .'s
-		if (s.charAt(0) == '(' || s.charAt(0) == '\"' || s.charAt(0) == '[') {
+		//DONE:
+		//remove ()'s from beginning and end
+		//remove []'s from beginning and end
+		//remove {}'s from beginning and end
+		//remove " from beginning and end
+		//remove ,'s from beginning and end
+
+		//TO_DO
+		//remove .'s from beginning and end
+		//
+		char firstChar = s.charAt(0);
+
+		if (firstChar == '(' || firstChar == ')' || firstChar == '[' || firstChar == ']' || firstChar == '{' || firstChar == '}' || firstChar == '\"' || firstChar == ',' || firstChar == '.') {
 			s = s.substring(1);
 		}
 		if (s.contains("(") && s.contains(")")) {
@@ -119,6 +160,9 @@ public class BaseTest {
 			return s.substring(0, s.length() - 1);
 		}
 		if (s.contains("\"")) {
+			return s.substring(0, s.length() - 1);
+		}
+		if (s.contains(",")) {
 			return s.substring(0, s.length() - 1);
 		}
 
