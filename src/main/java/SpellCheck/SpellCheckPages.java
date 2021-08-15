@@ -33,7 +33,7 @@ public class SpellCheckPages extends BaseTest{
 	public Object[][] getRandomPages(){
 
 		int length = 100;
-		
+
 		Object[][] o = new Object[length][1];
 		driver.navigate().to("https://oldschool.runescape.wiki/");
 		List<String> pages = new ArrayList<String>();
@@ -47,38 +47,38 @@ public class SpellCheckPages extends BaseTest{
 		return o;
 
 	}
-	
+
 	@AfterSuite
 	public void offerSuggestions() throws IOException {
-		
+
 		Scanner scanner = new Scanner(System.in);
-		
+
 		for (Map.Entry<String, String> error: failedWords.entrySet()) {
-			
+
 			String word = error.getKey();
 			String sentence = error.getValue();
-			
+
 			System.out.println("\nPotential error " + word +   
 					"\n" + sentence + "\n"
 					);
-			
+
 			System.out.println("Do you want to add word: " + word + "\n");
 			System.out.println("1: Yes");
 			System.out.println("2: No");
 			System.out.println("");
-			
+
 			String choice = scanner.nextLine();
-			
+
 			if (choice.equals("1")) {
 				addWordToDictionary(word, fileName);
 			}
-			
+
 		}
-		
+
 		scanner.close();
-		
+
 	}
-	
+
 
 	@Test (dataProvider = "getRandomPages")
 	public void spellCheck(String page) throws IOException {
@@ -100,7 +100,7 @@ public class SpellCheckPages extends BaseTest{
 		List<String> allWords = getWordsFromDictionary("C:\\Users\\nheis\\eclipse-workspace\\RuneScapeWikiSpellChecker\\src\\main\\resources\\OSRS-Dictionary.txt");
 
 		//System.out.print(url + ": ");
-		
+
 		assert(checkSpelling(cleanText, fileName, allWords, allLinkWords));
 
 	}
@@ -198,8 +198,13 @@ public class SpellCheckPages extends BaseTest{
 					addWordToDictionary(word, fileName);
 				}
 				else {
+
+					if(match.getRule().getId().equals("OXFORD_SPELLING_Z_NOT_S") || match.getRule().getId().equals("MORFOLOGIK_RULE_EN_GB")) {
+						failedWords.put(word, sentence.getText());
+					}
+
 					b = false;
-					failedWords.put(word, sentence.getText());
+
 					System.out.println("\nPotential error " + word +   
 							"\n" + sentence.getText() +
 							"\nID: " + match.getRule().getId() + " = " + match.getMessage() + "\n"
@@ -220,7 +225,7 @@ public class SpellCheckPages extends BaseTest{
 		}
 
 		System.out.println("Added " + count + " new words.");
-		
+
 		return b;
 	}
 
