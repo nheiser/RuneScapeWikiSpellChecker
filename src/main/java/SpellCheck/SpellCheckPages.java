@@ -10,6 +10,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 import java.util.Set;
 
@@ -24,8 +25,7 @@ import org.languagetool.tools.ContextTools;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.testng.Reporter;
-import org.testng.annotations.DataProvider;
-import org.testng.annotations.Test;
+import org.testng.annotations.*;
 
 public class SpellCheckPages extends BaseTest{
 
@@ -47,6 +47,38 @@ public class SpellCheckPages extends BaseTest{
 		return o;
 
 	}
+	
+	@AfterSuite
+	public void offerSuggestions() throws IOException {
+		
+		Scanner scanner = new Scanner(System.in);
+		
+		for (Map.Entry<String, String> error: failedWords.entrySet()) {
+			
+			String word = error.getKey();
+			String sentence = error.getValue();
+			
+			System.out.println("\nPotential error " + word +   
+					"\n" + sentence + "\n"
+					);
+			
+			System.out.println("Do you want to add word: " + word + "\n");
+			System.out.println("1: Yes");
+			System.out.println("2: No");
+			System.out.println("");
+			
+			String choice = scanner.nextLine();
+			
+			if (choice.equals("1")) {
+				addWordToDictionary(word, fileName);
+			}
+			
+		}
+		
+		scanner.close();
+		
+	}
+	
 
 	@Test (dataProvider = "getRandomPages")
 	public void spellCheck(String page) throws IOException {
@@ -128,7 +160,8 @@ public class SpellCheckPages extends BaseTest{
 		ignore.add("CLICK_HYPHEN");
 		//MISSING_HYPHEN 
 		//CLOSE_SCRUTINY 
-		//
+		//WITH_THE_EXCEPTION_OF 
+		//IN_A_X_MANNER 
 		//
 
 		List<String> wordsToIgnore = exceptions;
@@ -166,7 +199,7 @@ public class SpellCheckPages extends BaseTest{
 				}
 				else {
 					b = false;
-
+					failedWords.put(word, sentence.getText());
 					System.out.println("\nPotential error " + word +   
 							"\n" + sentence.getText() +
 							"\nID: " + match.getRule().getId() + " = " + match.getMessage() + "\n"
