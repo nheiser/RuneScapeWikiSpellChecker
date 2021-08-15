@@ -46,7 +46,7 @@ public class BaseTest {
 
 		for(WebElement link: links) {
 			for(String s: link.getText().split(" ")) {
-				words.add(s.toLowerCase());
+				words.add(s);//.toLowerCase());
 			}
 		}
 		return words;

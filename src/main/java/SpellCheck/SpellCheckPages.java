@@ -169,18 +169,14 @@ public class SpellCheckPages extends BaseTest{
 
 					System.out.println("\nPotential error " + word +   
 							"\n" + sentence.getText() +
-							"\nID: " + match.getRule().getId() + " = " + match.getMessage() + 
-							"\nSuggested correction(s): " +
-							match.getSuggestedReplacements() + "\n"
-
+							"\nID: " + match.getRule().getId() + " = " + match.getMessage() + "\n"
 							);
 
 					String errorMessage = 
 							"<br>Potential error: " + word +  
 							"<br>" + sentence.getText() +
 							"<br>ID: " + match.getRule().getId() + " = " + match.getMessage() + 
-							"<br>Suggested correction(s): " +
-							match.getSuggestedReplacements() + "<br>";
+							"<br>";
 
 					Reporter.log(errorMessage);
 
