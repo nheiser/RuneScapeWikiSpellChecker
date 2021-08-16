@@ -56,11 +56,11 @@ public class SpellCheckPages extends BaseTest{
 		for (Map.Entry<RuleMatch, String> error: failedWords.entrySet()) {
 
 			ContextTools c = new ContextTools();
-			
+
 			String word = error.getValue().substring(error.getKey().getFromPos(), error.getKey().getToPos());
-			
+
 			String sentence = c.getPlainTextContext(error.getKey().getFromPos(), error.getKey().getToPos(), error.getValue());
-			
+
 			System.out.println("\nPotential error: " + word +   
 					"\n" + sentence + "\n"
 					);
@@ -191,35 +191,40 @@ public class SpellCheckPages extends BaseTest{
 		for (RuleMatch match: matches) {
 
 			word = text.substring(match.getFromPos(), match.getToPos());
-			//sentence = c.getPlainTextContext(match.getFromPos(), match.getToPos(), text);
-			sentence = match.getSentence();
 
-			if (!getWordsFromDictionary("C:\\Users\\nheis\\eclipse-workspace\\RuneScapeWikiSpellChecker\\src\\main\\resources\\OSRS-Dictionary.txt").contains(word)) {
+			//if word does not contain any numbers
+			if (!word.matches(".*\\d.*")) {
 
-				if (linkExceptions.contains(word)) {
-					count++;
-					addWordToDictionary(word, fileName);
-				}
-				else {
+				sentence = match.getSentence();
 
-					if(match.getRule().getId().equals("OXFORD_SPELLING_Z_NOT_S") || match.getRule().getId().equals("MORFOLOGIK_RULE_EN_GB")) {
-						failedWords.put(match, sentence.getText());
+				if (!getWordsFromDictionary("C:\\Users\\nheis\\eclipse-workspace\\RuneScapeWikiSpellChecker\\src\\main\\resources\\OSRS-Dictionary.txt").contains(word)) {
+
+					if (linkExceptions.contains(word)) {
+						count++;
+						addWordToDictionary(word, fileName);
 					}
+					else {
 
-					b = false;
+						if(match.getRule().getId().equals("OXFORD_SPELLING_Z_NOT_S") || match.getRule().getId().equals("MORFOLOGIK_RULE_EN_GB")) {
+							failedWords.put(match, sentence.getText());
+						}
 
-					System.out.println("\nPotential error " + word +   
-							"\n" + sentence.getText() +
-							"\nID: " + match.getRule().getId() + " = " + match.getMessage() + "\n"
-							);
+						b = false;
 
-					String errorMessage = 
-							"<br>Potential error: " + word +  
-							"<br>" + sentence.getText() +
-							"<br>ID: " + match.getRule().getId() + " = " + match.getMessage() + 
-							"<br>";
+						System.out.println("\nPotential error " + word +   
+								"\n" + sentence.getText() +
+								"\nID: " + match.getRule().getId() + " = " + match.getMessage() + "\n"
+								);
 
-					Reporter.log(errorMessage);
+						String errorMessage = 
+								"<br>Potential error: " + word +  
+								"<br>" + sentence.getText() +
+								"<br>ID: " + match.getRule().getId() + " = " + match.getMessage() + 
+								"<br>";
+
+						Reporter.log(errorMessage);
+
+					}
 
 				}
 
