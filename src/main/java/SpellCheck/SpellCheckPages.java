@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.Set;
+import java.util.logging.ErrorManager;
 
 import org.languagetool.AnalyzedSentence;
 import org.languagetool.JLanguageTool;
@@ -32,7 +33,7 @@ public class SpellCheckPages extends BaseTest{
 	@DataProvider
 	public Object[][] getRandomPages(){
 
-		int length = 100;
+		int length = 4;
 
 		Object[][] o = new Object[length][1];
 		driver.navigate().to("https://oldschool.runescape.wiki/");
@@ -53,19 +54,13 @@ public class SpellCheckPages extends BaseTest{
 
 		Scanner scanner = new Scanner(System.in);
 
-		for (Map.Entry<RuleMatch, String> error: failedWords.entrySet()) {
-
-			ContextTools c = new ContextTools();
-
-			String word = error.getValue().substring(error.getKey().getFromPos(), error.getKey().getToPos());
-
-			String sentence = c.getPlainTextContext(error.getKey().getFromPos(), error.getKey().getToPos(), error.getValue());
-
-			System.out.println("\nPotential error: " + word +   
-					"\n" + sentence + "\n"
+		for (Map.Entry<String, String> error: failedWords.entrySet()) {
+			
+			System.out.println("\nPotential error: " + error.getKey() +
+					"\n" + error.getValue() + "\n"
 					);
 
-			System.out.println("Do you want to add word: " + word + "\n");
+			System.out.println("Do you want to add word: " + error.getKey() + "\n");
 			System.out.println("1: Yes");
 			System.out.println("2: No");
 			System.out.println("");
@@ -73,7 +68,7 @@ public class SpellCheckPages extends BaseTest{
 			String choice = scanner.nextLine();
 
 			if (choice.equals("1")) {
-				addWordToDictionary(word, fileName);
+				addWordToDictionary(error.getKey(), fileName);
 			}
 
 		}
@@ -165,6 +160,13 @@ public class SpellCheckPages extends BaseTest{
 		//CLOSE_SCRUTINY 
 		//WITH_THE_EXCEPTION_OF 
 		//IN_A_X_MANNER 
+		//NUMEROUS_DIFFERENT 
+		//CHILDISH_LANGUAGE 
+		//ONE_OF_THE_ONLY 
+		//SECOND_LARGEST_HYPHEN 
+		//EXTREME_ADJECTIVES 
+		//
+		//
 		//
 
 		List<String> wordsToIgnore = exceptions;
@@ -196,7 +198,7 @@ public class SpellCheckPages extends BaseTest{
 			if (!word.matches(".*\\d.*")) {
 
 				sentence = match.getSentence();
-
+				
 				if (!getWordsFromDictionary("C:\\Users\\nheis\\eclipse-workspace\\RuneScapeWikiSpellChecker\\src\\main\\resources\\OSRS-Dictionary.txt").contains(word)) {
 
 					if (linkExceptions.contains(word)) {
@@ -206,7 +208,7 @@ public class SpellCheckPages extends BaseTest{
 					else {
 
 						if(match.getRule().getId().equals("OXFORD_SPELLING_Z_NOT_S") || match.getRule().getId().equals("MORFOLOGIK_RULE_EN_GB")) {
-							failedWords.put(match, sentence.getText());
+							failedWords.put(word, c.getPlainTextContext(match.getFromPos(), match.getToPos(), text));
 						}
 
 						b = false;

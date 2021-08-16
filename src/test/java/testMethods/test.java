@@ -61,7 +61,7 @@ public class test {
 
 		List<String> exceptions = BaseTest.getWordsFromDictionary("C:\\Users\\nheis\\eclipse-workspace\\RuneScapeWikiSpellChecker\\src\\test\\resources\\Test-Dictionary.txt");//new ArrayList<String>();
 		
-		Assert.assertTrue(SpellCheckPages.checkSpelling(sentence, exceptions, exceptions));
+		//Assert.assertTrue(SpellCheckPages.checkSpelling(sentence, exceptions, exceptions));
 	}
 
 	@Test (dataProvider = "sampleStrings")
