@@ -26,7 +26,7 @@ public class BaseTest {
 	WebDriver driver;
 	Actions action;
 	String fileName = "C:\\Users\\nheis\\eclipse-workspace\\RuneScapeWikiSpellChecker\\src\\main\\resources\\OSRS-Dictionary.txt";
-	static Map<String, String> failedWords = new HashMap<String, String>();
+	static Map<RuleMatch, String> failedWords = new HashMap<RuleMatch, String>();
 	//word, sentence
 	
 	@BeforeTest

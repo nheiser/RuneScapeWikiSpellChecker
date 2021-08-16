@@ -53,12 +53,15 @@ public class SpellCheckPages extends BaseTest{
 
 		Scanner scanner = new Scanner(System.in);
 
-		for (Map.Entry<String, String> error: failedWords.entrySet()) {
+		for (Map.Entry<RuleMatch, String> error: failedWords.entrySet()) {
 
-			String word = error.getKey();
-			String sentence = error.getValue();
-
-			System.out.println("\nPotential error " + word +   
+			ContextTools c = new ContextTools();
+			
+			String word = error.getValue().substring(error.getKey().getFromPos(), error.getKey().getToPos());
+			
+			String sentence = c.getPlainTextContext(error.getKey().getFromPos(), error.getKey().getToPos(), error.getValue());
+			
+			System.out.println("\nPotential error: " + word +   
 					"\n" + sentence + "\n"
 					);
 
@@ -200,7 +203,7 @@ public class SpellCheckPages extends BaseTest{
 				else {
 
 					if(match.getRule().getId().equals("OXFORD_SPELLING_Z_NOT_S") || match.getRule().getId().equals("MORFOLOGIK_RULE_EN_GB")) {
-						failedWords.put(word, sentence.getText());
+						failedWords.put(match, sentence.getText());
 					}
 
 					b = false;
