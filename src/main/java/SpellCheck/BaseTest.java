@@ -58,6 +58,11 @@ public class BaseTest {
 				words.add(s);//.toLowerCase());
 			}
 		}
+		
+		for (String s: driver.getTitle().substring(0, driver.getTitle().indexOf(" - OSRS Wiki")).split(" ")){
+			words.add(s);
+		}
+				
 		return words;
 	}
 

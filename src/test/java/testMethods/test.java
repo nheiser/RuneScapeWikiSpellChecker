@@ -32,7 +32,9 @@ public class test {
 		driver.navigate().to("https://oldschool.runescape.wiki/w/Dragon_Slayer_II");
 		
 		String text = driver.findElement(By.tagName("body")).getText();
-		System.out.println(BaseTest.getCleanText(text));
+		System.out.println(driver.getTitle().substring(0, driver.getTitle().indexOf(" - OSRS Wiki")));
+		
+		//System.out.println(BaseTest.getCleanText(text));
 	}
 	
 	@Test (dataProvider="sampleSentences")

@@ -28,12 +28,14 @@ import org.openqa.selenium.WebElement;
 import org.testng.Reporter;
 import org.testng.annotations.*;
 
+import junit.framework.Assert;
+
 public class SpellCheckPages extends BaseTest{
 
 	@DataProvider
 	public Object[][] getRandomPages(){
 
-		int length = 4;
+		int length = 100;
 
 		Object[][] o = new Object[length][1];
 		driver.navigate().to("https://oldschool.runescape.wiki/");
@@ -63,7 +65,6 @@ public class SpellCheckPages extends BaseTest{
 			System.out.println("Do you want to add word: " + error.getKey() + "\n");
 			System.out.println("1: Yes");
 			System.out.println("2: No");
-			System.out.println("");
 
 			String choice = scanner.nextLine();
 
@@ -76,7 +77,6 @@ public class SpellCheckPages extends BaseTest{
 		scanner.close();
 
 	}
-
 
 	@Test (dataProvider = "getRandomPages")
 	public void spellCheck(String page) throws IOException {
@@ -97,10 +97,12 @@ public class SpellCheckPages extends BaseTest{
 
 		List<String> allWords = getWordsFromDictionary("C:\\Users\\nheis\\eclipse-workspace\\RuneScapeWikiSpellChecker\\src\\main\\resources\\OSRS-Dictionary.txt");
 
-		//System.out.print(url + ": ");
-
-		assert(checkSpelling(cleanText, fileName, allWords, allLinkWords));
-
+		int spellingErrors = getSpellingErrors(cleanText, fileName, allWords, allLinkWords);
+		
+		//System.out.println("Added " + newWords + " word(s) from: " + url);
+		
+		Assert.assertEquals(spellingErrors, 0);
+		
 	}
 
 	public static String getSentence(String text, int startPos, int endPos) {
@@ -131,7 +133,7 @@ public class SpellCheckPages extends BaseTest{
 		//return text.substring(startPos, endPos).trim();
 
 	}
-	public static boolean checkSpelling(String text, String fileName, List<String> exceptions, List<String> linkExceptions) throws IOException {
+	public int getSpellingErrors(String text, String fileName, List<String> exceptions, List<String> linkExceptions) throws IOException {
 
 		List<String> ignore = new ArrayList<String>();
 		//ignore.add("OXFORD_SPELLING_Z_NOT_S");
@@ -156,16 +158,18 @@ public class SpellCheckPages extends BaseTest{
 		ignore.add("LITTLE_BIT");
 		ignore.add("ALL_OF_THE");
 		ignore.add("CLICK_HYPHEN");
-		//MISSING_HYPHEN 
-		//CLOSE_SCRUTINY 
-		//WITH_THE_EXCEPTION_OF 
-		//IN_A_X_MANNER 
-		//NUMEROUS_DIFFERENT 
-		//CHILDISH_LANGUAGE 
-		//ONE_OF_THE_ONLY 
-		//SECOND_LARGEST_HYPHEN 
-		//EXTREME_ADJECTIVES 
-		//
+		ignore.add("CLOSE_SCRUTINY");
+		ignore.add("WITH_THE_EXCEPTION_OF");
+		ignore.add("IN_A_X_MANNER");
+		ignore.add("NUMEROUS_DIFFERENT");
+		ignore.add("ONE_OF_THE_ONLY");
+		ignore.add("EXTREME_ADJECTIVES");
+		//MISSING_HYPHEN
+		//CHILDISH_LANGUAGE
+		//SECOND_LARGEST_HYPHEN
+		//VERY_UNIQUE
+		//TRUNK_BOOT 
+		//WHETHER
 		//
 		//
 
@@ -187,8 +191,7 @@ public class SpellCheckPages extends BaseTest{
 		AnalyzedSentence sentence;
 		String word;
 		ContextTools c = new ContextTools();
-		boolean b = true;
-		int count = 0;
+		int spellingErrors = 0;
 
 		for (RuleMatch match: matches) {
 
@@ -202,18 +205,17 @@ public class SpellCheckPages extends BaseTest{
 				if (!getWordsFromDictionary("C:\\Users\\nheis\\eclipse-workspace\\RuneScapeWikiSpellChecker\\src\\main\\resources\\OSRS-Dictionary.txt").contains(word)) {
 
 					if (linkExceptions.contains(word)) {
-						count++;
 						addWordToDictionary(word, fileName);
 					}
 					else {
-
+							
+						spellingErrors++;
+						
 						if(match.getRule().getId().equals("OXFORD_SPELLING_Z_NOT_S") || match.getRule().getId().equals("MORFOLOGIK_RULE_EN_GB")) {
 							failedWords.put(word, c.getPlainTextContext(match.getFromPos(), match.getToPos(), text));
 						}
 
-						b = false;
-
-						System.out.println("\nPotential error " + word +   
+						System.out.println("\nPotential error: " + word +   
 								"\n" + sentence.getText() +
 								"\nID: " + match.getRule().getId() + " = " + match.getMessage() + "\n"
 								);
@@ -234,9 +236,7 @@ public class SpellCheckPages extends BaseTest{
 
 		}
 
-		System.out.println("Added " + count + " new words.");
-
-		return b;
+		return spellingErrors;
 	}
 
 }
