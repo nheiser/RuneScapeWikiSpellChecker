@@ -101,7 +101,9 @@ public class SpellCheckPages extends BaseTest{
 		
 		//System.out.println("Added " + newWords + " word(s) from: " + url);
 		
-		Assert.assertEquals(spellingErrors, 0);
+		//Reporter.log("<a>" + driver.getCurrentUrl() + "</a>");
+		
+		Assert.assertEquals(0, spellingErrors);
 		
 	}
 
@@ -164,12 +166,18 @@ public class SpellCheckPages extends BaseTest{
 		ignore.add("NUMEROUS_DIFFERENT");
 		ignore.add("ONE_OF_THE_ONLY");
 		ignore.add("EXTREME_ADJECTIVES");
+		ignore.add("CHILDISH_LANGUAGE");
+		ignore.add("SECOND_LARGEST_HYPHEN");
+		ignore.add("VERY_UNIQUE");
+		ignore.add("TRUNK_BOOT");
+		ignore.add("WHETHER");
+		ignore.add("FEWER_LESS");
+		
+		//ignore.add("");
 		//MISSING_HYPHEN
-		//CHILDISH_LANGUAGE
-		//SECOND_LARGEST_HYPHEN
-		//VERY_UNIQUE
-		//TRUNK_BOOT 
-		//WHETHER
+		//ADJECTIVE_IN_ATTRIBUTE
+		//LARGE_NUMBER_OF
+		//ARRIVE_ON_AT_THE_BEACH 
 		//
 		//
 
@@ -196,9 +204,10 @@ public class SpellCheckPages extends BaseTest{
 		for (RuleMatch match: matches) {
 
 			word = text.substring(match.getFromPos(), match.getToPos());
-
+			
 			//if word does not contain any numbers
-			if (!word.matches(".*\\d.*")) {
+			//if word only contains letters
+			if (word.matches("^[a-zA-Z]*$")) {
 
 				sentence = match.getSentence();
 				
