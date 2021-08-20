@@ -26,9 +26,8 @@ public class BaseTest {
 
 	WebDriver driver;
 	Actions action;
-	String fileName = "C:\\Users\\nheis\\eclipse-workspace\\RuneScapeWikiSpellChecker\\src\\main\\resources\\OSRS-Dictionary.txt";
-	static Map<String, String> failedWords = new HashMap<String, String>();
-	//word, sentence
+	String fileName = "C:\\Users\\nheis\\eclipse-workspace\\RuneScapeWikiSpellChecker\\src\\main\\resources\\OSRS\\OSRS-Dictionary.txt";
+	Map<String, String> failedWords = new HashMap<String, String>();
 	
 	@BeforeTest
 	public void initialize() {
@@ -55,7 +54,7 @@ public class BaseTest {
 
 		for(WebElement link: links) {
 			for(String s: link.getText().split(" ")) {
-				words.add(s);//.toLowerCase());
+				words.add(s);
 			}
 		}
 		
@@ -66,11 +65,8 @@ public class BaseTest {
 		return words;
 	}
 
-	public static void addWordToDictionary(String word, String fileName) throws IOException {
+	public void addWordToDictionary(String word, String fileName) throws IOException {
 		FileWriter filewriter = new FileWriter(fileName, true);
-		//List<String> dictionaryWords = getWordsFromDictionary(fileName);
-		//Set<String> words = new HashSet<String>();
-		//words.addAll(dictionaryWords);
 
 		filewriter.append(word);
 		filewriter.append("\n");
@@ -97,7 +93,6 @@ public class BaseTest {
 				count++;
 				filewriter.append(word);
 				filewriter.append('\n');
-				//System.out.print(word);
 			}
 
 		}
@@ -106,7 +101,7 @@ public class BaseTest {
 		filewriter.close();
 	}
 
-	public static List<String> getWordsFromDictionary(String path) throws FileNotFoundException{
+	public List<String> getWordsFromDictionary(String path) throws FileNotFoundException{
 		File file = new File(path);
 		Scanner scanner = new Scanner(file);
 
@@ -124,7 +119,7 @@ public class BaseTest {
 
 	}
 
-	public static String getCleanText(String rawText) {
+	public String getCleanText(String rawText) {
 
 		String text = "";
 		String line = "";
@@ -143,45 +138,5 @@ public class BaseTest {
 
 		return text;
 	}
-
-
-	public static String cleanString(String s) {
-		//DONE:
-		//remove ()'s from beginning and end
-		//remove []'s from beginning and end
-		//remove {}'s from beginning and end
-		//remove " from beginning and end
-		//remove ,'s from beginning and end
-
-		//TO_DO
-		//remove .'s from beginning and end
-		//
-		char firstChar = s.charAt(0);
-
-		if (firstChar == '(' || firstChar == ')' || firstChar == '[' || firstChar == ']' || firstChar == '{' || firstChar == '}' || firstChar == '\"' || firstChar == ',' || firstChar == '.') {
-			s = s.substring(1);
-		}
-		if (s.contains("(") && s.contains(")")) {
-			return s;
-		}
-		if (s.contains(")")) {
-			return s.substring(0, s.length() - 1);
-		}
-		if (s.contains("[") && s.contains("]")) {
-			return s;
-		}
-		if (s.contains("]")) {
-			return s.substring(0, s.length() - 1);
-		}
-		if (s.contains("\"")) {
-			return s.substring(0, s.length() - 1);
-		}
-		if (s.contains(",")) {
-			return s.substring(0, s.length() - 1);
-		}
-
-		return s;
-	}
-
 
 }

@@ -81,7 +81,7 @@ public class SpellCheckPages extends BaseTest{
 	@Test (dataProvider = "getRandomPages")
 	public void spellCheck(String page) throws IOException {
 
-		String fileName = "C:\\Users\\nheis\\eclipse-workspace\\RuneScapeWikiSpellChecker\\src\\main\\resources\\OSRS-Dictionary.txt";
+		String fileName = "C:\\Users\\nheis\\eclipse-workspace\\RuneScapeWikiSpellChecker\\src\\main\\resources\\OSRS\\OSRS-Dictionary.txt";
 
 		driver.navigate().to(page);
 
@@ -95,7 +95,7 @@ public class SpellCheckPages extends BaseTest{
 
 		String cleanText = getCleanText(rawText);
 
-		List<String> allWords = getWordsFromDictionary("C:\\Users\\nheis\\eclipse-workspace\\RuneScapeWikiSpellChecker\\src\\main\\resources\\OSRS-Dictionary.txt");
+		List<String> allWords = getWordsFromDictionary("C:\\Users\\nheis\\eclipse-workspace\\RuneScapeWikiSpellChecker\\src\\main\\resources\\OSRS\\OSRS-Dictionary.txt");
 
 		int spellingErrors = getSpellingErrors(cleanText, fileName, allWords, allLinkWords);
 		
@@ -107,7 +107,7 @@ public class SpellCheckPages extends BaseTest{
 		
 	}
 
-	public static String getSentence(String text, int startPos, int endPos) {
+	public String getSentence(String text, int startPos, int endPos) {
 
 		//int start = match.getFromPos();
 		//int end = match.getToPos();

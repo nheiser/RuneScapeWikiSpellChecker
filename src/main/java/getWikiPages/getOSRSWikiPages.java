@@ -1,40 +1,39 @@
 package getWikiPages;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.ProtocolException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Scanner;
+import java.util.Set;
 
-import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
-
-import com.google.gson.JsonParser;
-
 
 public class getOSRSWikiPages {
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
 
 		Scanner scanner;
-		//JSONObject extra = new JSONObject();
-		String apcontinue = "";
-		
-		
+		String gapcontinue = "";
+
+		List<String> list = new ArrayList<String>();
 		try {
 
+			FileWriter file = new FileWriter("C:\\Users\\nheis\\eclipse-workspace\\RuneScapeWikiSpellChecker\\src\\main\\resources\\OSRS\\wikiPages.txt");
+			BufferedWriter bf = new BufferedWriter(file);
+			
 			while (true) {
-
-				URL url = new URL("https://oldschool.runescape.wiki/api.php?action=query&list=allpages&aplimit=500" + apcontinue + "&format=json");
-
+				//URL url = new URL("https://oldschool.runescape.wiki/api.php?action=query&list=allpages&aplimit=500" + apcontinue + "&format=json");
+				URL url = new URL("https://oldschool.runescape.wiki/api.php?action=query&generator=allpages&gapfilterredir=nonredirects&gaplimit=500" + gapcontinue + "&format=json");
 				HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 				conn.setRequestMethod("GET");
 				conn.connect();
 
-				//Getting the response code
 				int responsecode = conn.getResponseCode();
 
 				if (responsecode != 200) {
@@ -44,45 +43,52 @@ public class getOSRSWikiPages {
 					String inline = "";
 					scanner = new Scanner(url.openStream());
 
-					//Write all the JSON data into a string using a scanner
 					while (scanner.hasNext()) {
 						inline += scanner.nextLine();
 					}
 
-					//System.out.println(inline);
-
-					//Using the JSON simple library parse the string into a json object
 					JSONParser parse = new JSONParser();
-
 					JSONObject base = (JSONObject) parse.parse(inline);
 
-					//System.out.println(base);
-
-					JSONObject extra = new JSONObject();
-					
-					extra = (JSONObject) base.get("continue");
-					
-					apcontinue = "&apcontinue=" + (String) extra.get("apcontinue");
-					
 					JSONObject pages = (JSONObject) base.get("query");
-					
-					//System.out.println(apcontinue);
+					JSONObject arr = (JSONObject) pages.get("pages");
 
-					JSONArray arr = (JSONArray) pages.get("allpages");
-
-					for (int i = 0; i < arr.size(); i++) {
-
-						JSONObject page = (JSONObject) arr.get(i);
-						//System.out.println(page.get("title"));
-
+					for (Object id: arr.keySet()) {
+						JSONObject page = (JSONObject) arr.get(id);
+						list.add(page.get("title").toString());
 					}
-					
+
+					try {
+
+						JSONObject extra = new JSONObject();
+						extra = (JSONObject) base.get("continue");
+						gapcontinue = "&gapcontinue=" + (String) extra.get("gapcontinue");
+
+					} catch(Exception e) {
+						break;
+					}
+
 				}
-				//System.out.println(apcontinue);
+				System.out.println(gapcontinue);
 				scanner.close();
 
 			}
+
+			Set<String> hs = new HashSet<String>();
 			
+			java.util.Collections.sort(list);
+			for (String s: list) {
+				if (!hs.add(s)) {
+					System.out.println("Duplicate item: " + s);
+					break;
+					
+				}
+				bf.write(s);
+				bf.write("\n");
+			}
+			System.out.println(list.size());
+			
+			bf.close();
 
 		} catch(Exception e) {
 

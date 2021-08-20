@@ -29,82 +29,10 @@ public class test {
 		WebDriver driver = new ChromeDriver();
 		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
 	
-		driver.navigate().to("https://oldschool.runescape.wiki/w/Dragon_Slayer_II");
+		driver.navigate().to("https://oldschool.runescape.wiki/'24-carat' sword");
 		
 		String text = driver.findElement(By.tagName("body")).getText();
-		System.out.println(driver.getTitle().substring(0, driver.getTitle().indexOf(" - OSRS Wiki")));
-		
-		//System.out.println(BaseTest.getCleanText(text));
-	}
-	
-	@Test (dataProvider="sampleSentences")
-	public void testGetSentence(String sentence, String expectedOutput) {
-
-		ContextTools c = new ContextTools();
-		String text = "Helllo world.";
-		//String sentence = c.getPlainTextContext(0, 5, text);
-
-		String errorMessage = 
-				"Potential error " +
-				"<" + "Helllo" + ">" +  
-				"<br>" + "Helllo world." +
-				"<br>ID: " + "101" + " = " + "mispelled" + 
-				"<br>Suggested correction(s): " +
-				"Hello" + "<br>";
-		
-		Reporter.log(errorMessage, true);
-		
-		Assert.assertTrue(expectedOutput.equals(SpellCheckPages.getSentence(sentence, 6, 7)));
-
-	}
-
-	@Test (dataProvider = "sampleStrings")
-	public void testCheckSpelling(String sentence, String g) throws IOException {
-
-		List<String> exceptions = BaseTest.getWordsFromDictionary("C:\\Users\\nheis\\eclipse-workspace\\RuneScapeWikiSpellChecker\\src\\test\\resources\\Test-Dictionary.txt");//new ArrayList<String>();
-		
-		//Assert.assertTrue(SpellCheckPages.checkSpelling(sentence, exceptions, exceptions));
-	}
-
-	@Test (dataProvider = "sampleStrings")
-	public void testCleanString(String s, String expectedOutput) {
-
-		System.out.println("In Test");
-		Assert.assertTrue(BaseTest.cleanString(s).equals(expectedOutput));
-
-	}
-
-
-	@DataProvider
-	public Object[][] sampleStrings(){
-		System.out.println("In Data Provider");
-		return new Object[][] {{"Zulrah's", "Potion"}, {"Zulrah'", "Potion"},
-			{"Zulrah", "Potion"}, {"Zulra", "Potion"},
-			//{",Potionx", "Potion"}, {"Potionx,", "Potion"},
-			//{"[Potionx", "Potion"}, {"Potionx[", "Potion"},
-			//{"]Potionx", "Potion"}, {"Potionx]", "Potion"},
-			//{"{Potionx", "Potion"}, {"Potionx{", "Potion"},
-			//{"}Potionx", "Potion"}, {"Potionx}", "Potion"},
-			//{"\"Potionx", "Potion"}, {"Potionx\"", "Potion"},
-			//{"Potionx(1)", "Potion(1)"}, {"Potionx[1]", "Potion[1]"},
-			//{"(Potionx", "Potion"}, {"Potionx(", "Potion"},
-			//{".Potionx", "Potion"}, {"Potionx", "Potion"}
-			/*{"duelling", true}, {"dueling", false},
-			{"jewellery", true}, {"jewelry", false},
-			{"centre", true}, {"center", false},
-			{"grey", true}, {"gray", false},
-			{"favour", true}, {"favor", false},
-			{"artefact", true}, {"artifact", false},
-			{"defence", true}, {"defense", false},
-			{"offence", true}, {"offense", false},
-			{"tradeable", true}, {"tradable", false},
-			{"fulfil", true}, {"fulfill", false},
-			{"travelled", true}, {"traveled", false},
-			{"rumour", true}, {"rumor", false}
-			//{""}, {""}
-			 * */
-			 
-		};
+		System.out.println(driver.getTitle().substring(0, driver.getTitle().indexOf(" - OSRS Wiki")));	
 	}
 
 	@DataProvider
@@ -116,11 +44,9 @@ public class test {
 		//
 		////////////////////////////////////////////////
 
-
 		//can create 's and '
 		//cannot create part before 's
 		//all words in ' are their own word => Mort'ton => Mort, ton in dict
-		//all words in - are their own word => Anti-dragon => Anti, Dragon in dict
 		//cannot create singular from plural
 		//cannot create plural from singular
 		//does not recognize words like free.to.play.
@@ -170,15 +96,6 @@ public class test {
 			{"rumour", true}, {"rumor", false}
 			//{""}, {""}
 		};
-
-	}
-
-	@DataProvider
-	public Object[][] sampleSentences(){		
-
-		return new Object[][] {{"Helllo world.", "Helllo world."}, 
-			{"Helllo world", "Helllo world"},
-			{"Hi. Helllo world.", "Helllo world."}};
 
 	}
 
