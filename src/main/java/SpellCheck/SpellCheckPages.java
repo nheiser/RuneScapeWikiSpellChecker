@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
@@ -17,7 +16,6 @@ import java.util.logging.ErrorManager;
 
 import org.languagetool.AnalyzedSentence;
 import org.languagetool.JLanguageTool;
-import org.languagetool.language.AmericanEnglish;
 import org.languagetool.language.BritishEnglish;
 import org.languagetool.rules.Rule;
 import org.languagetool.rules.RuleMatch;
@@ -35,7 +33,7 @@ public class SpellCheckPages extends BaseTest{
 	@DataProvider
 	public Object[][] getRandomPages(){
 
-		int length = 100;
+		int length = 2;
 
 		Object[][] o = new Object[length][1];
 		driver.navigate().to("https://oldschool.runescape.wiki/");
@@ -51,6 +49,17 @@ public class SpellCheckPages extends BaseTest{
 
 	}
 
+	@DataProvider
+	public Object[][] getAllPages(){
+		
+		//File file = new File(path);
+		//Scanner scanner = new Scanner(file);
+		
+		return new Object[0][0];
+		
+	}
+	
+	
 	@AfterSuite
 	public void offerSuggestions() throws IOException {
 
@@ -69,7 +78,7 @@ public class SpellCheckPages extends BaseTest{
 			String choice = scanner.nextLine();
 
 			if (choice.equals("1")) {
-				addWordToDictionary(error.getKey(), fileName);
+				addWordToDictionary(error.getKey(), path + "/Dictionary.txt");
 			}
 
 		}
@@ -79,9 +88,8 @@ public class SpellCheckPages extends BaseTest{
 	}
 
 	@Test (dataProvider = "getRandomPages")
+	@Parameters("wiki")
 	public void spellCheck(String page) throws IOException {
-
-		String fileName = "C:\\Users\\nheis\\eclipse-workspace\\RuneScapeWikiSpellChecker\\src\\main\\resources\\OSRS\\OSRS-Dictionary.txt";
 
 		driver.navigate().to(page);
 
@@ -89,15 +97,13 @@ public class SpellCheckPages extends BaseTest{
 
 		List<String> allLinkWords = getAllLinkWords(url);
 
-		//addWordsToDictionary(allLinkWords);
-
 		String rawText = driver.findElement(By.tagName("body")).getText();
 
 		String cleanText = getCleanText(rawText);
 
-		List<String> allWords = getWordsFromDictionary("C:\\Users\\nheis\\eclipse-workspace\\RuneScapeWikiSpellChecker\\src\\main\\resources\\OSRS\\OSRS-Dictionary.txt");
+		List<String> allWords = getWordsFromDictionary(path + "/Dictionary.txt");
 
-		int spellingErrors = getSpellingErrors(cleanText, fileName, allWords, allLinkWords);
+		int spellingErrors = getSpellingErrors(cleanText, allWords, allLinkWords);
 		
 		//System.out.println("Added " + newWords + " word(s) from: " + url);
 		
@@ -106,36 +112,7 @@ public class SpellCheckPages extends BaseTest{
 		Assert.assertEquals(0, spellingErrors);
 		
 	}
-
-	public String getSentence(String text, int startPos, int endPos) {
-
-		//int start = match.getFromPos();
-		//int end = match.getToPos();
-
-		while(endPos < text.length() - 1) {
-			if (text.charAt(endPos) == '.') {
-				break;
-			}
-			endPos++;
-
-		}
-		while (startPos > 0) {
-
-			if (text.charAt(startPos) == '.') {
-				startPos++;
-				break;
-			}
-			if (text.charAt(startPos) == '\n') {
-				break;
-			}
-			startPos--;
-		}
-
-		return text.substring(startPos, endPos + 1).trim();
-		//return text.substring(startPos, endPos).trim();
-
-	}
-	public int getSpellingErrors(String text, String fileName, List<String> exceptions, List<String> linkExceptions) throws IOException {
+	public int getSpellingErrors(String text, List<String> exceptions, List<String> linkExceptions) throws IOException {
 
 		List<String> ignore = new ArrayList<String>();
 		//ignore.add("OXFORD_SPELLING_Z_NOT_S");
@@ -211,10 +188,10 @@ public class SpellCheckPages extends BaseTest{
 
 				sentence = match.getSentence();
 				
-				if (!getWordsFromDictionary("C:\\Users\\nheis\\eclipse-workspace\\RuneScapeWikiSpellChecker\\src\\main\\resources\\OSRS-Dictionary.txt").contains(word)) {
+				if (!getWordsFromDictionary(path + "/Dictionary.txt").contains(word)) {
 
 					if (linkExceptions.contains(word)) {
-						addWordToDictionary(word, fileName);
+						addWordToDictionary(word, path + "/Dictionary.txt");
 					}
 					else {
 							

@@ -3,8 +3,9 @@
 
 <suite parallel="false" name="Suite">
   <test name="Test">
+  <parameter name = "wiki" value="OSRS" />
     <classes>
-      <class name="testMethods.test"/>
+      <class name="SpellCheck.SpellCheckPages"/>
     </classes>
   </test> <!-- Test -->
 </suite> <!-- Suite -->

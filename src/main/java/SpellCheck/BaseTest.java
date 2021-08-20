@@ -26,14 +26,20 @@ public class BaseTest {
 
 	WebDriver driver;
 	Actions action;
-	String fileName = "C:\\Users\\nheis\\eclipse-workspace\\RuneScapeWikiSpellChecker\\src\\main\\resources\\OSRS\\OSRS-Dictionary.txt";
+	String path;
+	String baseUrl;
 	Map<String, String> failedWords = new HashMap<String, String>();
 	
 	@BeforeTest
-	public void initialize() {
-		System.setProperty("webdriver.chrome.driver","C:\\Users\\nheis\\eclipse-workspace\\RuneScapeWikiSpellChecker\\src\\main\\resources\\drivers\\chromedriver.exe");
-		//URL url = getClass().getResource("chromedriver.exe");
-		//File file = new File(url.getPath());
+	@Parameters("wiki")
+	public void initialize(String wiki) {
+	
+		System.setProperty("webdriver.chrome.driver","src/main/resources/drivers/chromedriver.exe");
+
+		if (wiki.equalsIgnoreCase("OSRS")) {
+			path = "src/main/resources/OSRS";
+			baseUrl = "https://oldschool.runescape.wiki";
+		}
 		
 		driver = new ChromeDriver();
 		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
@@ -65,38 +71,11 @@ public class BaseTest {
 		return words;
 	}
 
-	public void addWordToDictionary(String word, String fileName) throws IOException {
-		FileWriter filewriter = new FileWriter(fileName, true);
+	public void addWordToDictionary(String word, String path) throws IOException {
+		FileWriter filewriter = new FileWriter(path, true);
 
 		filewriter.append(word);
 		filewriter.append("\n");
-		filewriter.flush();
-		filewriter.close();
-	}
-	public void addWordsToDictionary(List<String> newWords) throws IOException {
-
-		//driver.navigate().to(url);
-
-		FileWriter filewriter = new FileWriter(fileName, true);
-		List<String> dictionaryWords = getWordsFromDictionary(fileName);
-		Set<String> words = new HashSet<String>();
-		words.addAll(dictionaryWords);
-
-		int count = 0;
-
-		for (String word: newWords) {
-
-			if (word.length() > 1) {
-				word = cleanString(word);
-			}				
-			if (word.length() > 1 && word.matches(".*[a-zA-Z]+.*") && words.add(word)) {
-				count++;
-				filewriter.append(word);
-				filewriter.append('\n');
-			}
-
-		}
-		System.out.println("Added " + count + " new words from: " + driver.getCurrentUrl());
 		filewriter.flush();
 		filewriter.close();
 	}

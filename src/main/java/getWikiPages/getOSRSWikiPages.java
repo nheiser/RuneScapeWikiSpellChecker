@@ -20,14 +20,15 @@ public class getOSRSWikiPages {
 
 		Scanner scanner;
 		String gapcontinue = "";
-
+		int i=1;
 		List<String> list = new ArrayList<String>();
 		try {
 
-			FileWriter file = new FileWriter("C:\\Users\\nheis\\eclipse-workspace\\RuneScapeWikiSpellChecker\\src\\main\\resources\\OSRS\\wikiPages.txt");
+			FileWriter file = new FileWriter("src/main/resources/OSRS/wikiPages.txt");
 			BufferedWriter bf = new BufferedWriter(file);
-			
-			while (true) {
+
+			while (i==1) {
+				i++;
 				//URL url = new URL("https://oldschool.runescape.wiki/api.php?action=query&list=allpages&aplimit=500" + apcontinue + "&format=json");
 				URL url = new URL("https://oldschool.runescape.wiki/api.php?action=query&generator=allpages&gapfilterredir=nonredirects&gaplimit=500" + gapcontinue + "&format=json");
 				HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -75,19 +76,19 @@ public class getOSRSWikiPages {
 			}
 
 			Set<String> hs = new HashSet<String>();
-			
+
 			java.util.Collections.sort(list);
 			for (String s: list) {
 				if (!hs.add(s)) {
 					System.out.println("Duplicate item: " + s);
 					break;
-					
+
 				}
 				bf.write(s);
 				bf.write("\n");
 			}
 			System.out.println(list.size());
-			
+
 			bf.close();
 
 		} catch(Exception e) {

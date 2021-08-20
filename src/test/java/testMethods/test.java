@@ -25,7 +25,7 @@ public class test {
 	@Test
 	public void getTextFromPage() {
 		
-		System.setProperty("webdriver.chrome.driver","C:\\Users\\nheis\\eclipse-workspace\\RuneScapeWikiSpellChecker\\src\\main\\resources\\drivers\\chromedriver.exe");
+		System.setProperty("webdriver.chrome.driver","src/main/resources/drivers/chromedriver.exe");
 		WebDriver driver = new ChromeDriver();
 		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
 	
