@@ -6,7 +6,7 @@
     <classes>
       <class name="SpellCheck.SpellCheckPages">
         <methods>
-          <include name="spellCheck" invocation-numbers="0"/>
+          <include name="spellCheck" invocation-numbers="3 4 7 11 13 16 66 77 142 160 204 218 225 228 234 235 236 242 243 245 246 252 256 257 259 264 265 266 268 269 271 273 274 275 276 278 279 280 281 282 285 286 287 288 289 290 292 294 295 296 298 299 300 301 305 306 307 310 311 312 335 337 338 345 379 466 481 483 488"/>
           <include name="initialize"/>
           <include name="teardown"/>
           <include name="offerSuggestions"/>

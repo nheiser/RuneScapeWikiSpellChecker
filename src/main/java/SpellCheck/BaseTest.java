@@ -38,7 +38,7 @@ public class BaseTest {
 
 		if (wiki.equalsIgnoreCase("OSRS")) {
 			path = "src/main/resources/OSRS";
-			baseUrl = "https://oldschool.runescape.wiki";
+			baseUrl = "https://oldschool.runescape.wiki/w/";
 		}
 		
 		driver = new ChromeDriver();
@@ -54,9 +54,6 @@ public class BaseTest {
 	public List<String> getAllLinkWords(String url) {
 		List<WebElement> links = driver.findElements(By.tagName("a"));
 		List<String> words = new ArrayList<String>();
-
-		//link: [King Black Dragon]
-		//words: [King, Black, Dragon]
 
 		for(WebElement link: links) {
 			for(String s: link.getText().split(" ")) {
@@ -98,24 +95,29 @@ public class BaseTest {
 
 	}
 
-	public String getCleanText(String rawText) {
-
-		String text = "";
-		String line = "";
-
-		while (rawText.indexOf('\n') != -1) {
-
-			line = rawText.substring(0, rawText.indexOf('\n'));
-			
-			//only check text if it has a period and at least 4 words
-			if (line.contains(".") && line.split(" ").length >= 4) {
-				text = text + rawText.substring(0, rawText.indexOf('\n')) + "\n";
-			}
-
-			rawText = rawText.substring(rawText.indexOf('\n') + 1);
+	public String getCleanText(WebElement body) {
+		
+		String rawText = body.getText();
+		
+		rawText = rawText.replace(body.findElement(By.className("infobox")).getText(), "");
+		rawText = rawText.replace(body.findElement(By.className("musicplayer")).getText(), "");
+		rawText = rawText.replace(body.findElement(By.id("catlinks")).getText(), "");
+		
+		for (WebElement element: body.findElements(By.tagName("table"))) {
+			rawText = rawText.replace(element.getText(), "");
 		}
-
-		return text;
+		for (WebElement element: body.findElements(By.className("references"))) {
+			rawText = rawText.replace(element.getText(), "");
+		}
+		
+		for (WebElement element: body.findElements(By.className("chat-options"))) {
+			rawText = rawText.replace(element.getText(), "(#" + element.getText().substring(2));	
+		}
+		
+		rawText = rawText.replaceAll("[\n]+", "\n\n");
+		
+		return rawText;
+		
 	}
 
 }

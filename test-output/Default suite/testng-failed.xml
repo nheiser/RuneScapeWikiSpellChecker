@@ -3,14 +3,11 @@
 <suite name="Failed suite [Default suite]" guice-stage="DEVELOPMENT">
   <test thread-count="5" name="Default test(failed)">
     <classes>
-      <class name="SpellCheck.SpellCheckPages">
+      <class name="testMethods.test">
         <methods>
-          <include name="spellCheck"/>
-          <include name="initialize"/>
-          <include name="teardown"/>
-          <include name="offerSuggestions"/>
+          <include name="getTextFromPage"/>
         </methods>
-      </class> <!-- SpellCheck.SpellCheckPages -->
+      </class> <!-- testMethods.test -->
     </classes>
   </test> <!-- Default test(failed) -->
 </suite> <!-- Failed suite [Default suite] -->

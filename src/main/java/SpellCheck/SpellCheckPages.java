@@ -1,8 +1,10 @@
 package SpellCheck;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -33,7 +35,7 @@ public class SpellCheckPages extends BaseTest{
 	@DataProvider
 	public Object[][] getRandomPages(){
 
-		int length = 2;
+		int length = 100;
 
 		Object[][] o = new Object[length][1];
 		driver.navigate().to("https://oldschool.runescape.wiki/");
@@ -51,22 +53,51 @@ public class SpellCheckPages extends BaseTest{
 
 	@DataProvider
 	public Object[][] getAllPages(){
+
+		List<String> urls = new ArrayList<String>();
+				
+		try {
+
+			FileReader fr = new FileReader(path + "/wikiPages.txt");    
+			BufferedReader br = new BufferedReader(fr);    
+
+			int i = 0;
+			
+			String line = br.readLine();
+			
+			while (line != null){  
+				
+				urls.add(baseUrl + line);
+				line = br.readLine();
+				i++;
+			}
+			
+			br.close();
+			fr.close();
+
+			Object[][] o = new Object [500][1];
+			//urls.size();
+			
+			for (int j = 0; j < 500; j++) {
+				o[j][0] = urls.get(j);
+			}
 		
-		//File file = new File(path);
-		//Scanner scanner = new Scanner(file);
-		
-		return new Object[0][0];
-		
+			return o;
+			
+		} catch(Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+
 	}
-	
-	
+
 	@AfterSuite
 	public void offerSuggestions() throws IOException {
 
 		Scanner scanner = new Scanner(System.in);
 
 		for (Map.Entry<String, String> error: failedWords.entrySet()) {
-			
+
 			System.out.println("\nPotential error: " + error.getKey() +
 					"\n" + error.getValue() + "\n"
 					);
@@ -78,39 +109,32 @@ public class SpellCheckPages extends BaseTest{
 			String choice = scanner.nextLine();
 
 			if (choice.equals("1")) {
-				addWordToDictionary(error.getKey(), path + "/Dictionary.txt");
+				addWordToDictionary(error.getKey(), path + "/allowedWords.txt");
 			}
 
 		}
 
 		scanner.close();
-
+		
 	}
 
-	@Test (dataProvider = "getRandomPages")
+	@Test (dataProvider = "getAllPages")
 	@Parameters("wiki")
 	public void spellCheck(String page) throws IOException {
 
 		driver.navigate().to(page);
-
 		String url = driver.getCurrentUrl();
+		
+		WebElement body = driver.findElement(By.id("content"));
+		String cleanText = getCleanText(body);
 
+		List<String> allowedWords = getWordsFromDictionary(path + "/allowedWords.txt");
 		List<String> allLinkWords = getAllLinkWords(url);
 
-		String rawText = driver.findElement(By.tagName("body")).getText();
-
-		String cleanText = getCleanText(rawText);
-
-		List<String> allWords = getWordsFromDictionary(path + "/Dictionary.txt");
-
-		int spellingErrors = getSpellingErrors(cleanText, allWords, allLinkWords);
-		
-		//System.out.println("Added " + newWords + " word(s) from: " + url);
-		
-		//Reporter.log("<a>" + driver.getCurrentUrl() + "</a>");
-		
+		int spellingErrors = getSpellingErrors(cleanText, allowedWords, allLinkWords);
+		Reporter.log(driver.getCurrentUrl());
 		Assert.assertEquals(0, spellingErrors);
-		
+
 	}
 	public int getSpellingErrors(String text, List<String> exceptions, List<String> linkExceptions) throws IOException {
 
@@ -149,7 +173,7 @@ public class SpellCheckPages extends BaseTest{
 		ignore.add("TRUNK_BOOT");
 		ignore.add("WHETHER");
 		ignore.add("FEWER_LESS");
-		
+
 		//ignore.add("");
 		//MISSING_HYPHEN
 		//ADJECTIVE_IN_ATTRIBUTE
@@ -181,22 +205,21 @@ public class SpellCheckPages extends BaseTest{
 		for (RuleMatch match: matches) {
 
 			word = text.substring(match.getFromPos(), match.getToPos());
-			
-			//if word does not contain any numbers
+
 			//if word only contains letters
 			if (word.matches("^[a-zA-Z]*$")) {
 
 				sentence = match.getSentence();
-				
-				if (!getWordsFromDictionary(path + "/Dictionary.txt").contains(word)) {
+
+				if (!getWordsFromDictionary(path + "/allowedWords.txt").contains(word)) {
 
 					if (linkExceptions.contains(word)) {
-						addWordToDictionary(word, path + "/Dictionary.txt");
+						addWordToDictionary(word, path + "/allowedWords.txt");
 					}
 					else {
-							
+
 						spellingErrors++;
-						
+
 						if(match.getRule().getId().equals("OXFORD_SPELLING_Z_NOT_S") || match.getRule().getId().equals("MORFOLOGIK_RULE_EN_GB")) {
 							failedWords.put(word, c.getPlainTextContext(match.getFromPos(), match.getToPos(), text));
 						}
